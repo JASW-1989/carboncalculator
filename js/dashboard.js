@@ -21,7 +21,7 @@ export async function renderDashboard(container) {
   container.innerHTML = `
     <div class="page-title-section">
       <h1 class="page-title">儀表板</h1>
-      <p class="page-subtitle">ISO 14067 產品碳足跡盤查與報告系統</p>
+      <p class="page-subtitle">ISO 14067 遊程碳足跡盤查與報告系統</p>
     </div>
     <div class="stats-grid stagger-children">
       <div class="card stat-card">
@@ -60,7 +60,7 @@ export async function renderDashboard(container) {
           <div class="project-card-header">
             <div>
               <div class="project-card-name">${p.name || '未命名專案'}</div>
-              <div class="project-card-product">${p.productName || '—'}</div>
+              <div class="project-card-product">${p.tourName || '—'}</div>
             </div>
             <span class="badge ${p.verificationStatus === 'third_party_verified' ? 'badge-success' : p.verificationStatus === 'internal_review' ? 'badge-info' : 'badge-warning'}">
               ${p.verificationStatus === 'third_party_verified' ? '已查證' : p.verificationStatus === 'internal_review' ? '內部審查' : '未查證'}
@@ -72,8 +72,9 @@ export async function renderDashboard(container) {
             <span>📅 ${new Date(p.updatedAt).toLocaleDateString('zh-TW')}</span>
           </div>
           <div class="project-card-emission">
-            <span class="project-card-emission-value">${p.totalCO2e.toFixed(4)}</span>
-            <span class="project-card-emission-unit"> kgCO₂e / ${p.functionalUnit || 'FU'}</span>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">總碳排: ${p.totalCO2e.toFixed(2)} kgCO₂e</div>
+            <span class="project-card-emission-value">${(p.totalCO2e / (p.touristsCount || 1)).toFixed(4)}</span>
+            <span class="project-card-emission-unit"> kgCO₂e / ${p.functionalUnit || '每人次'}</span>
           </div>
         </div>
       `).join('')}

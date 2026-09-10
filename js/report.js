@@ -37,6 +37,35 @@ export async function renderReportEditor(tc, project) {
     </div>
   `;
 
+  // Render Chart if placeholder exists
+  setTimeout(() => {
+    const canvas = document.getElementById('report-pie-chart');
+    if (canvas && snap && typeof Chart !== 'undefined') {
+      const labels = [];
+      const data = [];
+      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#64748b'];
+      let i = 0;
+      for (const [, s] of Object.entries(snap.totalsByStage)) {
+        const stageName = project.lifeCycleStages.find(ls => ls.id === s.stageId)?.name || s.stageId;
+        labels.push(stageName);
+        data.push(s.totalCO2e);
+      }
+      new Chart(canvas, {
+        type: 'pie',
+        data: {
+          labels,
+          datasets: [{ data, backgroundColor: colors.slice(0, data.length), borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Inter' } } } }
+        }
+      });
+    }
+  }, 100);
+
+
   // Toolbar formatting commands
   const cmds = { 'tb-bold':'bold', 'tb-italic':'italic', 'tb-underline':'underline', 'tb-heading':'formatBlock', 'tb-list':'insertUnorderedList' };
   for (const [id, cmd] of Object.entries(cmds)) {

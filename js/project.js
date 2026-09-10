@@ -33,7 +33,7 @@ export async function renderProject(container, projectId) {
     <div class="page-title-section" style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
         <h1 class="page-title" id="proj-title">${project.name || '未命名專案'}</h1>
-        <p class="page-subtitle">${project.productName || '—'} · ${BOUNDARY_LABELS[project.boundary]||project.boundary}</p>
+        <p class="page-subtitle">${project.tourName || '—'} · ${BOUNDARY_LABELS[project.boundary]||project.boundary}</p>
       </div>
       <div style="display:flex;gap:var(--space-sm)">
         <button class="btn btn-secondary btn-sm" id="btn-export-bundle" title="匯出專案封存包">📦 匯出</button>
@@ -69,7 +69,7 @@ export async function renderProject(container, projectId) {
 
   // Delete
   document.getElementById('btn-delete-proj').addEventListener('click', async () => {
-    if (!confirm('確定刪除此專案？此操作不可復原。')) return;
+    console.log('Delete clicked'); if (!confirm('確定刪除此專案？此操作不可復原。')) return;
     const recs = await Store.getAllByIndex(STORES.activityRecords,'projectId',projectId);
     for (const r of recs) await Store.delete(STORES.activityRecords, r.id);
     const snaps = await Store.getAllByIndex(STORES.snapshots,'projectId',projectId);
@@ -101,12 +101,13 @@ async function renderInfoTab(tc, project) {
       <div class="card-body">
         <div class="form-row">
           <div class="form-group"><label class="form-label">專案名稱 <span class="required">*</span></label><input class="form-input" id="f-name" value="${project.name||''}"></div>
-          <div class="form-group"><label class="form-label">產品名稱 <span class="required">*</span></label><input class="form-input" id="f-product" value="${project.productName||''}"></div>
+          <div class="form-group"><label class="form-label">遊程名稱 <span class="required">*</span></label><input class="form-input" id="f-product" value="${project.tourName||''}"></div>
         </div>
-        <div class="form-group"><label class="form-label">產品描述</label><textarea class="form-textarea" id="f-desc">${project.productDescription||''}</textarea></div>
+        <div class="form-group"><label class="form-label">遊程描述</label><textarea class="form-textarea" id="f-desc">${project.productDescription||''}</textarea></div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">功能單位 <span class="required">*</span></label><input class="form-input" id="f-fu" value="${project.functionalUnit||''}" placeholder="例: 1 kg 產品 X"></div>
-          <div class="form-group"><label class="form-label">宣告單位</label><input class="form-input" id="f-du" value="${project.declaredUnit||''}" placeholder="B2B 中間品適用"></div>
+          <div class="form-group"><label class="form-label">功能單位</label><input class="form-input" id="f-fu" value="${project.functionalUnit||''}" readonly style="background:var(--bg-secondary)"></div>
+          <div class="form-group"><label class="form-label">宣告單位</label><input class="form-input" id="f-du" value="${project.declaredUnit||''}" readonly style="background:var(--bg-secondary)"></div>
+          <div class="form-group"><label class="form-label">遊客總數 (人次) <span class="required">*</span></label><input class="form-input" id="f-tourists" type="number" value="${project.touristsCount||1}" min="1"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">系統邊界 <span class="required">*</span></label>
@@ -122,11 +123,6 @@ async function renderInfoTab(tc, project) {
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">分配方法 <span class="required">*</span></label>
-            <select class="form-select" id="f-alloc">
-              ${Object.entries(ALLOC_LABELS).map(([k,v])=>`<option value="${k}" ${project.allocationMethod===k?'selected':''}>${v}</option>`).join('')}
-            </select>
-          </div>
           <div class="form-group"><label class="form-label">數據期間 <span class="required">*</span></label><input class="form-input" id="f-period" value="${project.dataPeriod||''}" placeholder="例: 2025年全年"></div>
         </div>
         <div class="form-group"><label class="form-label">截斷準則 <span class="required">*</span></label><textarea class="form-textarea" id="f-cutoff" rows="2">${project.cutoffCriteria||''}</textarea></div>
@@ -138,16 +134,7 @@ async function renderInfoTab(tc, project) {
         <div class="form-group"><label class="form-label">研究目標</label><textarea class="form-textarea" id="f-goal" rows="2">${project.studyGoal||''}</textarea></div>
         <div class="form-group"><label class="form-label">預期讀者</label><input class="form-input" id="f-audience" value="${project.intendedAudience||''}"></div>
         <hr class="divider">
-        <h4 style="margin-bottom:var(--space-base)">產品與共生產品設定 (分配基準)</h4>
-        <div class="form-row" style="background:var(--bg-secondary);padding:var(--space-md);border-radius:var(--radius-md);margin-bottom:var(--space-md)">
-          <div class="form-group"><label class="form-label">主產品產出量 (質量)</label><input class="form-input" id="f-main-mass" type="number" value="${project.mainProduct?.mass||1}"></div>
-          <div class="form-group"><label class="form-label">主產品經濟價值</label><input class="form-input" id="f-main-value" type="number" value="${project.mainProduct?.value||1}"></div>
-          <div class="form-group"><label class="form-label">主產品能量值</label><input class="form-input" id="f-main-energy" type="number" value="${project.mainProduct?.energy||0}"></div>
-        </div>
-        <div id="coproducts-container"></div>
-        <button class="btn btn-secondary btn-sm" id="btn-add-coproduct" style="margin-bottom:var(--space-md)">＋ 新增共生產品</button>
-        <hr class="divider">
-        <h4 style="margin-bottom:var(--space-base)">生命週期階段設定</h4>
+        <h4 style="margin-bottom:var(--space-base)">遊程階段設定</h4>
         <div id="stages-config" style="display:flex;flex-wrap:wrap;gap:var(--space-base)">
           ${stages.map(s=>`
             <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;padding:var(--space-sm) var(--space-md);border-radius:var(--radius-md);border:1px solid var(--border-primary);font-size:var(--fs-sm)">
@@ -186,50 +173,15 @@ async function renderInfoTab(tc, project) {
     });
   });
 
-  const renderCoProducts = () => {
-    const cpc = document.getElementById('coproducts-container');
-    cpc.innerHTML = project.coProducts.map((cp, idx) => `
-      <div class="form-row" style="align-items:flex-end;margin-bottom:var(--space-sm)">
-        <div class="form-group"><label class="form-label">共生產品名稱</label><input class="form-input cp-name" value="${cp.name||''}" data-idx="${idx}"></div>
-        <div class="form-group"><label class="form-label">質量</label><input class="form-input cp-mass" type="number" value="${cp.mass||0}" data-idx="${idx}"></div>
-        <div class="form-group"><label class="form-label">經濟價值</label><input class="form-input cp-value" type="number" value="${cp.value||0}" data-idx="${idx}"></div>
-        <div class="form-group"><label class="form-label">能量值</label><input class="form-input cp-energy" type="number" value="${cp.energy||0}" data-idx="${idx}"></div>
-        <div class="form-group"><button class="btn btn-ghost btn-sm cp-del" data-idx="${idx}" style="color:var(--accent-danger)">✕ 移除</button></div>
-      </div>
-    `).join('');
-    
-    cpc.querySelectorAll('.cp-del').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        project.coProducts.splice(e.target.dataset.idx, 1);
-        renderCoProducts();
-      });
-    });
-    cpc.querySelectorAll('input').forEach(inp => {
-      inp.addEventListener('change', (e) => {
-        const idx = e.target.dataset.idx;
-        const field = e.target.classList.contains('cp-name') ? 'name' : e.target.classList.contains('cp-mass') ? 'mass' : e.target.classList.contains('cp-value') ? 'value' : 'energy';
-        project.coProducts[idx][field] = field === 'name' ? e.target.value : Number(e.target.value);
-      });
-    });
-  };
-  
-  document.getElementById('btn-add-coproduct').addEventListener('click', () => {
-    project.coProducts = project.coProducts || [];
-    project.coProducts.push({ name: '', mass: 0, value: 0, energy: 0 });
-    renderCoProducts();
-  });
-  renderCoProducts();
 
   // Save
   document.getElementById('btn-save-info').addEventListener('click', async () => {
     project.name = document.getElementById('f-name').value;
-    project.productName = document.getElementById('f-product').value;
+    project.tourName = document.getElementById('f-product').value;
     project.productDescription = document.getElementById('f-desc').value;
-    project.functionalUnit = document.getElementById('f-fu').value;
-    project.declaredUnit = document.getElementById('f-du').value;
+    project.touristsCount = Number(document.getElementById('f-tourists').value) || 1;
     project.boundary = document.getElementById('f-boundary').value;
     project.gwpVersion = document.getElementById('f-gwp').value;
-    project.allocationMethod = document.getElementById('f-alloc').value;
     project.dataPeriod = document.getElementById('f-period').value;
     project.cutoffCriteria = document.getElementById('f-cutoff').value;
     project.pcrReference = document.getElementById('f-pcr').value;
@@ -238,11 +190,6 @@ async function renderInfoTab(tc, project) {
     project.studyGoal = document.getElementById('f-goal').value;
     project.intendedAudience = document.getElementById('f-audience').value;
     project.verificationStatus = document.getElementById('f-verify').value;
-    project.mainProduct = {
-      mass: Number(document.getElementById('f-main-mass').value) || 0,
-      value: Number(document.getElementById('f-main-value').value) || 0,
-      energy: Number(document.getElementById('f-main-energy').value) || 0
-    };
     // Stages
     document.querySelectorAll('#stages-config input[type=checkbox]').forEach(c => {
       const stage = project.lifeCycleStages.find(s => s.id === c.dataset.stage);
@@ -287,15 +234,6 @@ async function renderDataTab(tc, project) {
         </div>
       </div>
       
-      <div class="card" style="margin-bottom:var(--space-lg);border:${massBalance.errorPct>5?'1px solid var(--accent-danger)':'1px solid var(--border-primary)'}">
-        <div class="card-header"><h4 class="card-title">⚖️ 質量平衡檢核</h4></div>
-        <div class="card-body" style="display:flex;gap:var(--space-lg);align-items:center">
-           <div>投入總量: <strong>${massBalance.totalInput.toFixed(2)}</strong></div>
-           <div>產出總量: <strong>${massBalance.totalOutput.toFixed(2)}</strong></div>
-           <div>差異: <strong>${massBalance.diff.toFixed(2)}</strong></div>
-           <div style="color:${massBalance.errorPct>5?'var(--accent-danger)':'var(--accent-success)'}">誤差率: <strong>${massBalance.errorPct.toFixed(2)}%</strong> ${massBalance.errorPct>5?'(警告: 誤差過大)':'(正常)'}</div>
-        </div>
-      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
         <h3>活動數據輸入</h3>
         <button class="btn btn-primary btn-sm" id="btn-lock-snapshot">🔒 鎖定盤查版本</button>
@@ -324,7 +262,7 @@ async function renderDataTab(tc, project) {
       <div class="table-container">
         <table class="data-table">
           <thead><tr>
-            <th>項目名稱</th><th>活動數據</th><th>單位</th><th>排放係數</th><th>碳來源</th><th>數據類型</th><th>質量平衡</th><th>佐證資料</th><th style="text-align:right">CO₂e (kg)</th><th class="cell-action">操作</th>
+            <th>項目名稱</th><th>活動數據</th><th>單位</th><th>分攤比例(%)</th><th>排放係數</th><th>碳來源</th><th>數據類型</th><th>佐證資料</th><th style="text-align:right">CO₂e (kg)</th><th class="cell-action">操作</th>
           </tr></thead>
           <tbody id="stage-${stage.id}-body">
             ${stageRecords.length === 0 ? `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">尚無資料，點擊「新增項目」開始輸入</td></tr>` : stageRecords.map(r => {
@@ -334,6 +272,7 @@ async function renderDataTab(tc, project) {
                 <td><input class="form-input" style="min-width:120px" value="${r.itemName}" data-field="itemName"></td>
                 <td><input class="form-input" type="number" style="width:80px" value="${r.activityData}" data-field="activityData" step="any"></td>
                 <td><input class="form-input" style="width:60px" value="${r.activityUnit}" data-field="activityUnit"></td>
+                <td><input class="form-input" type="number" style="width:70px" value="${r.allocationRatio||100}" data-field="allocationRatio" step="any"></td>
                 <td><select class="form-select" data-field="emissionFactorId" style="min-width:120px">
                   <option value="">選擇係數</option>
                   ${factors.map(ff=>`<option value="${ff.id}" ${r.emissionFactorId===ff.id?'selected':''}>${ff.name}</option>`).join('')}
@@ -348,13 +287,6 @@ async function renderDataTab(tc, project) {
                   <option value="primary" ${r.dataType==='primary'?'selected':''}>初級</option>
                   <option value="secondary" ${r.dataType==='secondary'?'selected':''}>次級</option>
                 </select></td>
-                <td style="font-size:12px;display:flex;gap:4px">
-                  <select data-field="isInput" style="width:60px;padding:2px">
-                    <option value="true" ${r.isInput?'selected':''}>投入</option>
-                    <option value="false" ${!r.isInput?'selected':''}>產出</option>
-                  </select>
-                  <input type="number" data-field="massValue" style="width:60px;padding:2px" placeholder="kg" value="${r.massValue||0}">
-                </td>
                 <td><input class="form-input" style="width:100px" placeholder="網址或檔名" value="${r.evidenceUrl||''}" data-field="evidenceUrl"></td>
                 <td class="cell-number" style="font-weight:600;color:var(--accent-primary)">${co2e.toFixed(4)}</td>
                 <td class="cell-action"><button class="btn btn-ghost btn-sm delete-record" data-id="${r.id}" title="刪除">✕</button></td>
@@ -394,10 +326,8 @@ async function renderDataTab(tc, project) {
         const rec = await Store.get(STORES.activityRecords, rid);
         if (!rec) return;
         const field = input.dataset.field;
-        if (field === 'activityData' || field === 'massValue') {
+        if (field === 'activityData' || field === 'allocationRatio') {
           rec[field] = parseFloat(input.value) || 0;
-        } else if (field === 'isInput') {
-          rec[field] = input.value === 'true';
         } else if (field === 'emissionFactorId') {
           if (input.value === '__custom') {
             const val = prompt('請輸入自訂排放係數值 (kgCO₂e)：');
@@ -418,11 +348,11 @@ async function renderDataTab(tc, project) {
           rec[field] = input.value;
         }
         // Recalc
-        const { co2e } = calculateSingleEmission(rec.activityData, rec.activityUnit, rec.emissionFactorValue, rec.emissionFactorUnit, rec.carbonType);
+        const { co2e } = calculateSingleEmission(rec.activityData, rec.activityUnit, rec.emissionFactorValue, rec.emissionFactorUnit, rec.carbonType, rec.allocationRatio || 100);
         rec.co2e = co2e;
         await Store.put(STORES.activityRecords, rec);
         // We need to re-render to update the top stats and mass balance
-        if (field === 'activityData' || field === 'emissionFactorId' || field === 'carbonType' || field === 'isInput' || field === 'massValue') {
+        if (field === 'activityData' || field === 'allocationRatio' || field === 'emissionFactorId' || field === 'carbonType') {
           await renderDataTab(tc, project);
         } else {
           // just update display cell if it's a minor field, but safer to re-render

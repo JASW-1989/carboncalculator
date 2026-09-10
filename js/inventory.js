@@ -41,7 +41,7 @@ export async function renderInventory(tc, project) {
         <div class="table-container" style="position:relative;z-index:1">
           <table class="data-table" id="inventory-table">
             <thead><tr>
-              <th>生命週期階段</th><th>項目名稱</th><th style="text-align:right">活動數據</th><th>單位</th><th style="text-align:right">排放係數</th><th>係數單位</th><th>數據類型</th><th>資料來源</th><th style="text-align:right">CO₂e (kgCO₂e)</th>
+              <th>遊程階段</th><th>項目名稱</th><th style="text-align:right">活動數據</th><th>單位</th><th style="text-align:right">分攤(%)</th><th style="text-align:right">排放係數</th><th>係數單位</th><th>數據類型</th><th>資料來源</th><th style="text-align:right">CO₂e (kgCO₂e)</th>
             </tr></thead>
             <tbody>
               ${renderInventoryRows(snap, project)}
@@ -71,10 +71,10 @@ export async function renderInventory(tc, project) {
 
   // Export CSV
   document.getElementById('btn-export-csv')?.addEventListener('click', () => {
-    const headers = ['階段','項目','活動數據','單位','排放係數','係數單位','數據類型','資料來源','CO2e_kgCO2e'];
+    const headers = ['階段','項目','活動數據','單位','分攤比例%','排放係數','係數單位','數據類型','資料來源','CO2e_kgCO2e'];
     const rows = snap.lineItems.map(item => {
       const stageName = project.lifeCycleStages.find(s => s.id === item.stageId)?.name || item.stageId;
-      return [stageName, item.itemName, item.activityData, item.activityUnit, item.emissionFactorValue, item.emissionFactorUnit, item.dataType, item.dataSource||'', item.co2e?.toFixed(4)||0].join(',');
+      return [stageName, item.itemName, item.activityData, item.activityUnit, item.allocationRatio||100, item.emissionFactorValue, item.emissionFactorUnit, item.dataType, item.dataSource||'', item.co2e?.toFixed(4)||0].join(',');
     });
     const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -108,14 +108,18 @@ function renderInventoryRows(snap, project) {
       html += `<tr>
         <td>${stageName}</td><td>${item.itemName}</td>
         <td class="cell-number">${item.activityData}</td><td>${item.activityUnit}</td>
+        <td class="cell-number">${item.allocationRatio||100}%</td>
         <td class="cell-number">${item.emissionFactorValue}</td><td>${item.emissionFactorUnit}</td>
         <td>${item.dataType === 'primary' ? '初級' : '次級'}</td><td>${item.dataSource||'—'}</td>
         <td class="cell-number" style="font-weight:600">${item.co2e?.toFixed(4)||'—'}</td>
       </tr>`;
     }
     const stageTotal = items.reduce((s, i) => s + (i.co2e || 0), 0);
-    html += `<tr class="stage-subtotal"><td colspan="8" style="text-align:right"><strong>${stageName} 小計</strong></td><td class="cell-number"><strong>${stageTotal.toFixed(4)}</strong></td></tr>`;
+    html += `<tr class="stage-subtotal"><td colspan="9" style="text-align:right"><strong>${stageName} 小計</strong></td><td class="cell-number"><strong>${stageTotal.toFixed(4)}</strong></td></tr>`;
   }
-  html += `<tr class="grand-total"><td colspan="8" style="text-align:right"><strong>總計</strong></td><td class="cell-number"><strong>${snap.totalCO2e.toFixed(4)}</strong></td></tr>`;
+  html += `<tr class="grand-total"><td colspan="9" style="text-align:right"><strong>遊程總計 (Total)</strong></td><td class="cell-number"><strong>${snap.totalCO2e.toFixed(4)}</strong></td></tr>`;
+  
+  const perCapita = snap.totalCO2e / (project.touristsCount || 1);
+  html += `<tr class="grand-total" style="background-color: var(--accent-primary); color: white;"><td colspan="9" style="text-align:right"><strong>每人次碳足跡 (kgCO₂e / 人次)</strong></td><td class="cell-number" style="color: white;"><strong>${perCapita.toFixed(4)}</strong></td></tr>`;
   return html;
 }

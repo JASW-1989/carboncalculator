@@ -18,7 +18,7 @@ export function validateProject(project) {
   };
 
   req('name', '專案名稱');
-  req('productName', '產品名稱');
+  req('tourName', '遊程名稱');
   req('functionalUnit', '功能單位');
   req('boundary', '系統邊界');
   req('cutoffCriteria', '截斷準則');

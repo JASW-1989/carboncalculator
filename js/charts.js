@@ -5,13 +5,13 @@ import { Store, STORES } from './store.js';
 import { calculateTotal, calculatePercentages, identifyHotspots } from './calculator.js';
 
 const STAGE_COLORS = {
-  raw_material: '#14b8a6',
-  manufacturing: '#06b6d4',
-  distribution: '#8b5cf6',
-  use: '#f59e0b',
-  end_of_life: '#ef4444',
+  transport: '#14b8a6',
+  accommodation: '#06b6d4',
+  food: '#8b5cf6',
+  activities: '#f59e0b',
+  waste: '#ef4444',
 };
-const STAGE_NAMES = { raw_material:'原物料取得', manufacturing:'製造', distribution:'配送與運輸', use:'使用階段', end_of_life:'廢棄處理' };
+const STAGE_NAMES = { transport:'交通運輸', accommodation:'住宿服務', food:'餐飲服務', activities:'活動與遊憩', waste:'廢棄物處理' };
 
 export async function renderCharts(tc, project) {
   const records = await Store.getAllByIndex(STORES.activityRecords, 'projectId', project.id);
@@ -123,7 +123,7 @@ export async function renderCharts(tc, project) {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: ctx => \`\${ctx.parsed.y.toFixed(4)} kgCO₂e\` } },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y.toFixed(4)} kgCO₂e` } },
       },
       scales: {
         x: { ticks: { color: '#94a3b8', font: { family: 'Inter' } }, grid: { display: false } },

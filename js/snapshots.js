@@ -4,6 +4,8 @@
 import { Store, STORES } from './store.js';
 import { calculateTotal, calculatePercentages, calculateDataRatio, calculateAllocation, calculateMassBalance } from './calculator.js';
 import { logAction } from './audit-log.js';
+import { calculateDQR, autoAssessDQ } from './dq-assessment.js';
+import { getAllFactors } from './emission-factors.js';
 
 async function computeHash(data) {
   const encoder = new TextEncoder();
@@ -22,6 +24,20 @@ export async function createSnapshot(project) {
   const dataRatio = calculateDataRatio(records);
   const massBalance = calculateMassBalance(records);
   const { factor, allocatedTotals } = calculateAllocation({ totalCO2e, fossil, biogenicEmission, biogenicRemoval, luc }, project);
+
+  // Compute DQ
+  const factors = await getAllFactors();
+  const allScores = records.map(r => {
+    const f = factors.find(x => x.id === r.emissionFactorId);
+    return autoAssessDQ(r, f, project);
+  });
+  const agg = {};
+  for (const c of ['trr','grr','ter','precision','completeness']) {
+    const v = allScores.map(s => s[c]);
+    agg[c] = v.length ? v.reduce((a, b) => a + b, 0) / v.length : 3;
+  }
+  const dqrResult = calculateDQR(agg);
+  dqrResult.agg = agg;
 
   // Determine version number
   const existing = await Store.getAllByIndex(STORES.snapshots, 'projectId', project.id);
@@ -61,6 +77,7 @@ export async function createSnapshot(project) {
     allocationFactor: factor,
     massBalance,
     dataRatio,
+    dqResult: dqrResult,
     lineItems: snapshotData.lineItems,
     methodology: snapshotData.methodology,
     locked: true,

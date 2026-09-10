@@ -5,6 +5,7 @@ import { Store, STORES, openDB } from './store.js';
 import { initEmissionFactors } from './emission-factors.js';
 import { renderDashboard } from './dashboard.js';
 import { renderProject, currentProjectState } from './project.js';
+import { createProjectTemplate, createActivityRecord } from './store.js';
 import { renderFactorsPage } from './factors-page.js';
 import { importProjectBundle } from './export.js';
 
@@ -57,10 +58,60 @@ function renderView() {
   }
 }
 
+import { getAllFactors } from './emission-factors.js';
+
+async function checkAndCreateExampleProject() {
+  const projects = await Store.getAll(STORES.projects);
+  if (projects.length === 0) {
+    const p = createProjectTemplate();
+    await Store.put(STORES.projects, p);
+    
+    const factors = await getAllFactors();
+
+    // Add default activity records
+    const records = [
+      { stageId: 'activities', name: '麻繩', activityData: 160, unit: '段', factorId: 'ef-hemp', type: 'fossil', alloc: 100 },
+      { stageId: 'activities', name: '羊眼釘', activityData: 306, unit: '個', factorId: 'ef-screw', type: 'fossil', alloc: 100 },
+      { stageId: 'activities', name: 'A4紙張', activityData: 16, unit: '張', factorId: 'ef-paper-print', type: 'fossil', alloc: 100 },
+      { stageId: 'activities', name: '培養土', activityData: 1.5, unit: '包', factorId: 'ef-soil', type: 'fossil', alloc: 100 },
+      { stageId: 'activities', name: '水苔', activityData: 1, unit: '包', factorId: 'ef-moss', type: 'fossil', alloc: 100 },
+      { stageId: 'food', name: '蔬菜', activityData: 50.1, unit: '斤', factorId: 'ef-veg', type: 'fossil', alloc: 100 },
+      { stageId: 'food', name: '豬肉', activityData: 14480.34, unit: '斤', factorId: 'ef-pork', type: 'fossil', alloc: 100 },
+      { stageId: 'food', name: '米', activityData: 138, unit: '包', factorId: 'ef-rice', type: 'fossil', alloc: 100 },
+      { stageId: 'transport', name: '遊覽車', activityData: 167, unit: '人次', factorId: 'ef-diesel', type: 'fossil', alloc: 100 },
+      { stageId: 'accommodation', name: '全場外購電力', activityData: 22752, unit: 'kWh', factorId: 'ef-elec-tw', type: 'fossil', alloc: 1.54 },
+      { stageId: 'accommodation', name: '全場液化石油氣', activityData: 3383, unit: 'kg', factorId: 'ef-lpg', type: 'fossil', alloc: 1.54 },
+      { stageId: 'waste', name: '一般生活廢棄物', activityData: 0.359, unit: 'ton', factorId: 'ef-incineration', type: 'fossil', alloc: 100 }
+    ];
+    for (const r of records) {
+      const rec = createActivityRecord(p.id, r.stageId);
+      rec.itemName = r.name;
+      rec.activityData = r.activityData;
+      rec.activityUnit = r.unit;
+      rec.emissionFactorId = r.factorId;
+      rec.carbonType = r.type;
+      rec.allocationRatio = r.alloc;
+      
+      const f = factors.find(x => x.id === r.factorId);
+      if (f) {
+        rec.emissionFactorValue = f.coefficient;
+        rec.emissionFactorUnit = f.denominatorUnit;
+      }
+      
+      // Calculate co2e
+      const allocatedData = rec.activityData * (rec.allocationRatio / 100);
+      rec.co2e = allocatedData * rec.emissionFactorValue;
+
+      await Store.put(STORES.activityRecords, rec);
+    }
+  }
+}
+
 // ── Init ──
 async function init() {
   await openDB();
   await initEmissionFactors();
+  await checkAndCreateExampleProject();
   window.__nav = navigate;
   window.__showToast = showToast;
   // Setup sidebar nav

@@ -3,7 +3,7 @@
  * All persistent data goes through this module.
  */
 
-const DB_NAME = 'iso14067_pcf';
+const DB_NAME = 'iso14067_tour_v2';
 const DB_VERSION = 1;
 
 const STORES = {
@@ -97,14 +97,14 @@ export { STORES, openDB };
 export function createProjectTemplate() {
   return {
     id: crypto.randomUUID(),
-    name: '',
-    productName: '',
-    productDescription: '',
-    functionalUnit: '',
-    declaredUnit: '',
-    boundary: 'cradle-to-gate',
+    name: '頭城農場遊程盤查範例',
+    tourName: '地球志工 Earth Keeper',
+    productDescription: '單日/多日農業體驗遊程',
+    functionalUnit: '每人次',
+    declaredUnit: '人次',
+    touristsCount: 167,
+    boundary: 'cradle-to-grave',
     cutoffCriteria: '質量與能量貢獻低於總量 1% 之投入項予以排除，累計排除不超過 5%',
-    allocationMethod: 'mass',
     pcrReference: '',
     gwpVersion: 'AR6',
     dataPeriod: '',
@@ -112,14 +112,12 @@ export function createProjectTemplate() {
     technologyScope: '',
     studyGoal: '',
     intendedAudience: '',
-    mainProduct: { mass: 1, value: 1, energy: 0 },
-    coProducts: [],
     lifeCycleStages: [
-      { id: 'raw_material', name: '原物料取得', enabled: true },
-      { id: 'manufacturing', name: '製造', enabled: true },
-      { id: 'distribution', name: '配送與運輸', enabled: true },
-      { id: 'use', name: '使用階段', enabled: false },
-      { id: 'end_of_life', name: '廢棄處理', enabled: false },
+      { id: 'transport', name: '交通運輸', enabled: true },
+      { id: 'accommodation', name: '住宿服務', enabled: true },
+      { id: 'food', name: '餐飲服務', enabled: true },
+      { id: 'activities', name: '活動與遊憩', enabled: true },
+      { id: 'waste', name: '廢棄物處理', enabled: true },
     ],
     verificationStatus: 'unverified',
     createdAt: new Date().toISOString(),
@@ -142,8 +140,7 @@ export function createActivityRecord(projectId, stageId) {
     dataSource: '',
     carbonType: 'fossil',
     evidenceUrl: '',
-    isInput: false,
-    massValue: 0,
+    allocationRatio: 100,
     note: '',
     co2e: 0,
     createdAt: new Date().toISOString(),

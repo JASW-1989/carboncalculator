@@ -7,7 +7,7 @@ import { convert, canConvert } from './unit-converter.js';
  * Calculate CO2e for a single activity record
  * @returns {{ co2e: number, fossil: number, biogenicEmission: number, biogenicRemoval: number, luc: number, warning: string|null }}
  */
-export function calculateSingleEmission(activityData, activityUnit, factorValue, factorDenominatorUnit, carbonType = 'fossil') {
+export function calculateSingleEmission(activityData, activityUnit, factorValue, factorDenominatorUnit, carbonType = 'fossil', allocationRatio = 100) {
   if (!activityData || !factorValue) return { co2e: 0, fossil: 0, biogenicEmission: 0, biogenicRemoval: 0, luc: 0, warning: null };
   let data = activityData;
   let warning = null;
@@ -20,7 +20,10 @@ export function calculateSingleEmission(activityData, activityUnit, factorValue,
       return { co2e: 0, fossil: 0, biogenicEmission: 0, biogenicRemoval: 0, luc: 0, warning };
     }
   }
-  const co2e = data * factorValue;
+  
+  // Apply allocation ratio (e.g. 1.54%)
+  const allocatedData = data * (allocationRatio / 100);
+  const co2e = allocatedData * factorValue;
   if (co2e < 0 && factorValue > 0) warning = '活動數據為負值';
 
   let fossil = 0, biogenicEmission = 0, biogenicRemoval = 0, luc = 0;
@@ -47,7 +50,7 @@ export function calculateByStage(records) {
       stages[r.stageId] = { stageId: r.stageId, totalCO2e: 0, fossil: 0, biogenicEmission: 0, biogenicRemoval: 0, luc: 0, items: [] };
     }
     const res = calculateSingleEmission(
-      r.activityData, r.activityUnit, r.emissionFactorValue, r.emissionFactorUnit, r.carbonType
+      r.activityData, r.activityUnit, r.emissionFactorValue, r.emissionFactorUnit, r.carbonType, r.allocationRatio || 100
     );
     stages[r.stageId].totalCO2e += res.co2e;
     stages[r.stageId].fossil += res.fossil;
