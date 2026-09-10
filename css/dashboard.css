@@ -1,0 +1,11 @@
+/* Dashboard */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-lg); }
+.project-card { cursor: pointer; }
+.project-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: var(--space-md); }
+.project-card-name { font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+.project-card-product { font-size: var(--fs-xs); color: var(--text-tertiary); margin-top: 2px; }
+.project-card-meta { display: flex; gap: var(--space-base); margin-top: var(--space-md); font-size: var(--fs-xs); color: var(--text-muted); }
+.project-card-emission { margin-top: var(--space-base); padding-top: var(--space-base); border-top: 1px solid var(--border-glass); }
+.project-card-emission-value { font-size: var(--fs-xl); font-weight: var(--fw-bold); background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.project-card-emission-unit { font-size: var(--fs-xs); color: var(--text-tertiary); }

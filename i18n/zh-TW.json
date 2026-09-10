@@ -1,0 +1,76 @@
+{
+  "app": {
+    "title": "ISO 14067 產品碳足跡盤查系統",
+    "subtitle": "PCF Inventory & Report System"
+  },
+  "nav": {
+    "dashboard": "儀表板",
+    "projects": "專案管理",
+    "factors": "排放係數",
+    "settings": "系統設定"
+  },
+  "project": {
+    "new": "新增專案",
+    "name": "專案名稱",
+    "product": "產品名稱",
+    "boundary": "系統邊界",
+    "functional_unit": "功能單位",
+    "declared_unit": "宣告單位",
+    "cutoff": "截斷準則",
+    "allocation": "分配方法",
+    "pcr": "PCR 引用",
+    "gwp": "GWP 版本",
+    "data_period": "數據期間",
+    "geographic": "地理範疇",
+    "technology": "技術範疇",
+    "goal": "研究目標",
+    "audience": "預期讀者"
+  },
+  "boundary_options": {
+    "cradle-to-gate": "搖籃到大門 (Cradle-to-Gate)",
+    "cradle-to-grave": "搖籃到墳墓 (Cradle-to-Grave)",
+    "partial": "部分碳足跡 (Partial CFP)"
+  },
+  "allocation_options": {
+    "mass": "質量分配",
+    "economic": "經濟分配",
+    "energy": "能量分配",
+    "system_expansion": "系統擴展",
+    "other": "其他"
+  },
+  "gwp_options": {
+    "AR5": "IPCC AR5",
+    "AR6": "IPCC AR6"
+  },
+  "stages": {
+    "raw_material": "原物料取得",
+    "manufacturing": "製造",
+    "distribution": "配送與運輸",
+    "use": "使用階段",
+    "end_of_life": "廢棄處理"
+  },
+  "inventory": {
+    "locked_message": "此盤查清冊由系統自動生成，不可編輯。如需修正數據，請回到「盤查資料輸入」頁面修改後重新建立快照。",
+    "create_snapshot": "鎖定盤查版本",
+    "no_snapshot": "尚未建立盤查快照，請先輸入活動數據並點擊「鎖定盤查版本」。"
+  },
+  "report": {
+    "generate": "生成報告",
+    "edit": "編輯報告",
+    "export_pdf": "匯出 PDF",
+    "save": "儲存報告"
+  },
+  "actions": {
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "add": "新增",
+    "export": "匯出",
+    "import": "匯入"
+  },
+  "verification_status": {
+    "unverified": "尚未查證",
+    "internal_review": "內部審查",
+    "third_party_verified": "第三方查證完成"
+  }
+}

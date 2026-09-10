@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ISO 14067 產品碳足跡盤查與報告生成系統 — 盤查、版本鎖定、報告生成與查證準備工具">
+  <title>ISO 14067 產品碳足跡盤查系統</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/inventory.css">
+  <link rel="stylesheet" href="/css/report.css">
+  <link rel="stylesheet" href="/css/charts.css">
+  <link rel="stylesheet" href="/css/print.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js" defer></script>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">🌱</div>
+        <div>
+          <div class="sidebar-title">PCF 盤查系統</div>
+          <div class="sidebar-subtitle">ISO 14067:2018</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">主要功能</div>
+        <div class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span> 儀表板
+        </div>
+        <div class="nav-item" data-view="factors">
+          <span class="nav-icon">⚗️</span> 排放係數
+        </div>
+        <div class="nav-section-title">工具</div>
+        <div class="nav-item" id="btn-import-bundle" style="cursor:pointer">
+          <span class="nav-icon">📥</span> 匯入封存包
+        </div>
+        <div class="nav-section-title">說明</div>
+        <div class="nav-item" style="cursor:default;opacity:0.5">
+          <span class="nav-icon">📖</span> 操作指引
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div>v1.0.0 · ISO 14067:2018</div>
+        <div style="margin-top:2px">資料儲存於本機 IndexedDB</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <header class="main-header">
+        <div class="breadcrumb" id="breadcrumb">
+          <span class="breadcrumb-current">儀表板</span>
+        </div>
+        <div class="header-actions">
+          <span style="font-size:var(--fs-xs);color:var(--text-muted)">ISO 14067 PCF System</span>
+        </div>
+      </header>
+      <div class="main-body" id="main-body">
+        <!-- Dynamic content -->
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>

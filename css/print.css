@@ -1,0 +1,32 @@
+/* Print / PDF export */
+@media print {
+  @page { size: A4; margin: 20mm 15mm; }
+  body { background: #fff; color: #1a1a1a; font-size: 11pt; }
+  .sidebar, .main-header, .tab-bar, .report-toolbar, .btn, .toast-container,
+  .header-actions, .add-block-btn, .block-type-indicator { display: none !important; }
+  .main-content { margin-left: 0; }
+  .main-body { padding: 0; max-width: 100%; }
+  .card { background: #fff; border: 1px solid #ddd; box-shadow: none; backdrop-filter: none; }
+  .report-container { border: none; padding: 0; background: #fff; }
+  .report-block { break-inside: avoid; page-break-inside: avoid; border: none !important; background: transparent !important; }
+  .report-block::after { display: none; }
+  .report-block h2 { color: #0d6e63; break-after: avoid; }
+  .report-block h3 { break-after: avoid; }
+  .data-table { font-size: 9pt; }
+  .data-table th { background: #f0f0f0; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .data-table tbody tr:nth-child(even) { background: #f9f9f9; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .table-container { overflow: visible; break-inside: avoid; }
+  .data-table thead { display: table-header-group; }
+  .data-table tr { page-break-inside: avoid; }
+  .stat-value { background: none; -webkit-text-fill-color: #0d6e63; color: #0d6e63; }
+  .inventory-watermark { color: rgba(200,160,0,0.08); }
+  .inventory-locked-banner { background: #fff8e1; border-color: #f9a825; color: #e65100; }
+  h1 { font-size: 22pt; }
+  h2 { font-size: 16pt; }
+  h3 { font-size: 13pt; }
+  /* Cover page */
+  .report-cover { page-break-after: always; text-align: center; padding-top: 35%; }
+  .report-cover h1 { font-size: 28pt; color: #0d6e63; }
+  /* Page numbers via CSS counter */
+  .report-container { counter-reset: page-num; }
+}
